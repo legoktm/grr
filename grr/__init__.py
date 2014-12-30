@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-try:
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
+import configparser
 import json
 import subprocess
 import sys

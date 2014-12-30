@@ -10,7 +10,7 @@ The basic workflow involves using a detached head, and pulling down changes from
 work on them, and re-submitting them. Inspired by git-review, grr reads from .gitreview files
 and will try to use your gitreview.username setting.
 
-Installation: pip install tox
+Installation: pip install grr
 
 
 * grr init: Adds a `gerrit` remote and installs the commit-msg hook

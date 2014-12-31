@@ -4,7 +4,7 @@ import sys
 
 setup(
     name='grr',
-    version='0.2',
+    version='0.2.1',
     author='Kunal Mehta',
     author_email='legoktm@gmail.com',
     url='https://github.com/legoktm/grr/',

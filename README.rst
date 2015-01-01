@@ -4,6 +4,10 @@ grr
    :alt: Build Status
    :target: https://travis-ci.org/legoktm/grr
 
+.. image:: https://pypip.in/version/grr/badge.svg
+    :target: https://pypi.python.org/pypi/grr/
+    :alt: Latest Version
+
 ``grr`` is a simple utility to make using Gerrit a little less painful.
 
 The basic workflow involves using a detached head, and pulling down changes from gerrit to

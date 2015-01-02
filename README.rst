@@ -11,7 +11,7 @@ grr
 ``grr`` is a simple utility to make using Gerrit a little less painful.
 
 The basic workflow involves using a detached head, and pulling down changes from gerrit to
-work on them, and re-submitting them. Inspired by ``git-review``, ``grr`` reads from ``.gitreview`` files
+work on them, and re-submitting them. Inspired by git-review_, ``grr`` reads from ``.gitreview`` files
 and will try to use your ``gitreview.username`` setting.
 
 Installation:
@@ -29,3 +29,5 @@ Installation:
 * ``grr [branch]``: Shorthand for `grr review`.
 
 Licensed as CC-0.
+
+_git-review: https://pypi.python.org/pypi/git-review

@@ -4,7 +4,7 @@ grr
    :alt: Build Status
    :target: https://travis-ci.org/legoktm/grr
 
-.. image:: https://pypip.in/version/grr/badge.svg
+.. image:: https://img.shields.io/pypi/v/grr.svg
     :target: https://pypi.python.org/pypi/grr/
     :alt: Latest Version
 

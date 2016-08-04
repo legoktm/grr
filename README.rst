@@ -28,6 +28,6 @@ Installation:
 * ``grr review [branch]``: Uploads your patches for review, the branch defaults to master.
 * ``grr [branch]``: Shorthand for `grr review`.
 
-Licensed as CC-0.
+Licensed as GPLv3 or later, see COPYING for details.
 
 _git-review: https://pypi.python.org/pypi/git-review

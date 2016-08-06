@@ -107,7 +107,10 @@ class Grr:
 
     def review(self, branch='master'):
         self.init_repo()
-        self.shell_exec(['git', 'push', 'gerrit', 'HEAD:refs/for/{0}'.format(branch)])
+        to = 'HEAD:refs/for/{0}'.format(branch)
+        if 'topic' in self.options:
+            to += '%topic=' + self.options['topic']
+        self.shell_exec(['git', 'push', 'gerrit', to])
 
     def fetch(self, changeset):
         if ':' in changeset:

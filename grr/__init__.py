@@ -24,13 +24,13 @@ from urllib.request import urlopen
 
 
 class Grr:
-    def __init__(self, debug=False):
-        self._debug = debug
+    def __init__(self, options):
+        self.options = options
         self._username = None
         self._config = None
 
     def debug(self, text):
-        if self._debug:
+        if self.options.get('debug'):
             self.out(text)
 
     def out(self, text):
@@ -57,14 +57,14 @@ class Grr:
         elif action == 'pull':
             # grr pull
             # grr pull REL1_24
-            self.pull(*args)
+            self.pull(args[0])
         elif action == 'checkout':
             # grr checkout
             # grr checkout REL1_24
-            self.checkout(*args)
+            self.checkout(args[0])
         elif action == 'review':
             # grr review REL1_24
-            self.review(*args)
+            self.review(args[0])
         elif not action:
             # grr
             self.review()
@@ -143,10 +143,17 @@ class Grr:
 
 def main():
     args = sys.argv[1:]
-    debug = '--debug' in args
-    if debug:
-        args.remove('--debug')
-    g = Grr(debug=debug)
+    options = {}
+    for arg in args[:]:
+        if arg.startswith('--'):
+            opt = arg[2:]
+            if '=' in opt:
+                sp = opt.split('=', 1)
+                options[sp[0]] = sp[1]
+            else:
+                options[opt] = True
+            args.remove(arg)
+    g = Grr(options=options)
     g.run(*args)
 
 if __name__ == '__main__':

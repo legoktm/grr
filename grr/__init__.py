@@ -51,6 +51,7 @@ class Grr:
         if action == 'init':
             # grr init
             self.init_repo()
+            self.checkout(branch='master', quiet=True)
         elif action == 'fetch':
             # grr 12345
             # grr 12345:2
@@ -101,8 +102,11 @@ class Grr:
             self._username = username
         return self._username
 
-    def checkout(self, branch='master'):
-        self.shell_exec(['git', 'checkout', 'origin/{0}'.format(branch)])
+    def checkout(self, branch='master', quiet=False):
+        args = ['git', 'checkout', 'origin/{0}'.format(branch)]
+        if quiet:
+            args.append('-q')
+        self.shell_exec(args)
 
     def pull(self, branch='master'):
         self.shell_exec(['git', 'fetch', 'origin'])
@@ -144,7 +148,6 @@ class Grr:
         commit_msg = '{username}@{host}:hooks/commit-msg'.format(username=self.username, **self.config)
         self.shell_exec(['scp', '-P' + self.config['port'], commit_msg, '.git/hooks/commit-msg'])
         self.out('Installed commit-msg hook')
-        self.shell_exec(['git', 'checkout', 'origin/master', '-q'])
 
 
 def main():

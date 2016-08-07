@@ -66,7 +66,7 @@ class Grr:
             self.checkout(args[0])
         elif action == 'review':
             # grr review REL1_24
-            self.review(args[0])
+            self.review(*args)
         elif not action:
             # grr
             self.review()

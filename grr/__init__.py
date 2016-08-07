@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import configparser
 import json
+import os.path
 import subprocess
 import sys
 from urllib.request import urlopen
@@ -75,9 +76,11 @@ class Grr:
     @property
     def config(self):
         if self._config is None:
+            # Find the repository root
+            root = self.shell_exec(['git', 'rev-parse', '--show-toplevel']).strip()
             self.debug('Parsing .gitreview file...')
             config = configparser.ConfigParser()
-            config.read('.gitreview')
+            config.read(os.path.join(root, '.gitreview'))
             self._config = config['gerrit']
         return self._config
 

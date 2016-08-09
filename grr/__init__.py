@@ -53,8 +53,8 @@ class Grr:
             self.init_repo()
             self.checkout(branch='master', quiet=True)
         elif action == 'fetch':
-            # grr 12345
-            # grr 12345:2
+            # grr fetch 12345
+            # grr fetch 12345:2
             self.fetch(args[0])
         elif action == 'pull':
             # grr pull
@@ -125,7 +125,7 @@ class Grr:
             fetch = {
                 'url': 'https://{host}/r/{name}'.format(
                     host=self.config['host'],
-                    name=self.config['project'].strip('.git')
+                    name=self.config['project'].rsplit('.', 1)[0]
                 ),
                 'ref': 'refs/changes/{0}/{1}/{2}'.format(change[-2:], change, patch)
             }

@@ -1,0 +1,37 @@
+{
+  "id": "mediawiki%2Fcore~master~I49541bd344fa81d20c9b4cf61b968b58137ab140",
+  "project": "mediawiki/core",
+  "branch": "master",
+  "hashtags": [],
+  "change_id": "I49541bd344fa81d20c9b4cf61b968b58137ab140",
+  "subject": "registration: Fix adding $formerGlobals in conversion script",
+  "status": "NEW",
+  "created": "2016-08-08 09:57:57.000000000",
+  "updated": "2016-08-08 10:03:35.000000000",
+  "mergeable": true,
+  "submittable": false,
+  "insertions": 1,
+  "deletions": 1,
+  "_number": 303525,
+  "owner": {
+    "_account_id": 458
+  },
+  "current_revision": "12113ce79f87f1f11c0c6e1de7e8bdd14416b51d",
+  "revisions": {
+    "12113ce79f87f1f11c0c6e1de7e8bdd14416b51d": {
+      "_number": 1,
+      "created": "2016-08-08 09:57:57.000000000",
+      "uploader": {
+        "_account_id": 458
+      },
+      "ref": "refs/changes/25/303525/1",
+      "fetch": {
+        "anonymous http": {
+          "url": "https://gerrit.wikimedia.org/r/mediawiki/core",
+          "ref": "refs/changes/25/303525/1"
+        }
+      }
+    }
+  }
+}
+

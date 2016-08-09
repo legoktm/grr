@@ -12,6 +12,8 @@ setup(
     long_description=open('README.rst').read(),
     packages=['grr'],
     install_requires=[],
+    test_suite='nose.collector',
+    tests_require=['nose'],
     entry_points={
         'console_scripts': [
             'grr = grr:main'

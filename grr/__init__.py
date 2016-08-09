@@ -59,11 +59,11 @@ class Grr:
         elif action == 'pull':
             # grr pull
             # grr pull REL1_24
-            self.pull(args[0])
+            self.pull(*args)
         elif action == 'checkout':
             # grr checkout
             # grr checkout REL1_24
-            self.checkout(args[0])
+            self.checkout(*args)
         elif action == 'review':
             # grr review REL1_24
             self.review(*args)

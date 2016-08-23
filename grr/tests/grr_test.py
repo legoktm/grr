@@ -82,6 +82,24 @@ class GrrTest(unittest.TestCase):
             ['git', 'checkout', 'FETCH_HEAD']
         ])
 
+    def test_cherry_pick(self):
+        # grr fetch 12345:2
+        mock = MockGrr({})
+        mock.run('cherry-pick', '12345:2')
+        self.assertEqual(mock.executed, [
+            ['git', 'fetch', 'https://gerrit.example.org/r/gerrit/example', 'refs/changes/45/12345/2'],
+            ['git', 'cherry-pick', 'FETCH_HEAD']
+        ])
+
+        # grr fetch 12345
+        # Note: this test is based on rest_api.json
+        mock = MockGrr({})
+        mock.run('cherry-pick', '12345')
+        self.assertEqual(mock.executed, [
+            ['git', 'fetch', 'https://gerrit.wikimedia.org/r/mediawiki/core', 'refs/changes/25/303525/1'],
+            ['git', 'cherry-pick', 'FETCH_HEAD']
+        ])
+
     def test_init_repo(self):
         mock = MockGrr({})
         mock._username = 'ExampleUser'

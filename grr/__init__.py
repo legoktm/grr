@@ -56,6 +56,12 @@ class Grr:
             # grr fetch 12345
             # grr fetch 12345:2
             self.fetch(args[0])
+            self.shell_exec(['git', 'checkout', 'FETCH_HEAD'])
+        elif action == 'cherry-pick':
+            # grr fetch 12345
+            # grr fetch 12345:2
+            self.fetch(args[0])
+            self.shell_exec(['git', 'cherry-pick', 'FETCH_HEAD'])
         elif action == 'pull':
             # grr pull
             # grr pull REL1_24
@@ -135,7 +141,6 @@ class Grr:
             current_rev = query['current_revision']
             fetch = query['revisions'][current_rev]['fetch']['anonymous http']
         self.shell_exec(['git', 'fetch', fetch['url'], fetch['ref']])
-        self.shell_exec(['git', 'checkout', 'FETCH_HEAD'])
 
     def init_repo(self):
         output = self.shell_exec(['git', 'remote'])

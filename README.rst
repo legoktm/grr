@@ -23,6 +23,7 @@ Installation:
 
 * ``grr init``: Adds a `gerrit` remote and installs the commit-msg hook
 * ``grr fetch 12345[:2]``: Pulls change 12345. An optional patchset # can be specified, otherwise the latest will be used.
+* ``grr cherry-pick 12345[:2]``: Just like fetch, except it cherry-picks the patch on top of HEAD.
 * ``grr pull [master]``: Pulls the latest remote changes and checks out the given branch, defaults to master.
 * ``grr checkout [master]``: Checkout the given branch, defaults to master
 * ``grr review [branch]``: Uploads your patches for review, the branch defaults to master.

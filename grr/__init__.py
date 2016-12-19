@@ -143,9 +143,8 @@ class Grr:
         self.shell_exec(['git', 'fetch', fetch['url'], fetch['ref']])
 
     def init_repo(self):
-        output = self.shell_exec(['git', 'remote'])
-        if 'gerrit\n' in output:
-            # Remote already setup
+        if os.path.isfile('.git/hooks/commit-msg'):
+            # Already configured
             return False
         remote = 'ssh://{username}@{host}:{port}/{project}'.format(username=self.username, **self.config)
         self.shell_exec(['git', 'remote', 'add', 'gerrit', remote])

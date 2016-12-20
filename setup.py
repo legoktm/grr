@@ -18,5 +18,6 @@ setup(
         'console_scripts': [
             'grr = grr:main'
         ],
-    }
+    },
+    include_package_data=True,
 )

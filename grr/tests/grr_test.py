@@ -16,13 +16,13 @@ class MockGrr(grr.Grr):
             'project': 'gerrit/example.git',
             'port': '29418'
         }
-        self.already_init = False
+
+    def init_repo(self):
+        # Don't write to the filesystem when testing
+        return False
 
     def shell_exec(self, args):
         self.executed.append(args)
-        if args == ['git', 'remote'] and self.already_init:
-            # This is kind of hacky but...
-            return 'gerrit\n'
         return ''
 
     def rest_api(self, query):
@@ -100,72 +100,43 @@ class GrrTest(unittest.TestCase):
             ['git', 'cherry-pick', 'FETCH_HEAD']
         ])
 
-    def test_init_repo(self):
-        mock = MockGrr({})
-        mock._username = 'ExampleUser'
-        mock.run('init')
-        self.assertEqual(mock.executed, [
-            ['git', 'remote'],
-            ['git', 'remote', 'add', 'gerrit', 'ssh://ExampleUser@gerrit.example.org:29418/gerrit/example.git'],
-            ['scp', '-P29418', 'ExampleUser@gerrit.example.org:hooks/commit-msg', '.git/hooks/commit-msg'],
-            ['git', 'checkout', 'origin/master', '-q']
-        ])
-
-        mock = MockGrr({})
-        mock._username = 'ExampleUser'
-        mock.already_init = True
-        mock.run('init')
-        self.assertEqual(mock.executed, [
-            ['git', 'remote'],
-            ['git', 'checkout', 'origin/master', '-q']
-        ])
-
     def test_review(self):
         # grr review
         mock = MockGrr({})
-        mock.already_init = True
         mock.run('review')
         self.assertEqual(mock.executed, [
-            ['git', 'remote'],
             ['git', 'push', 'gerrit', 'HEAD:refs/for/master']
         ])
 
         # grr review develop
         mock = MockGrr({})
-        mock.already_init = True
         mock.run('review', 'develop')
         self.assertEqual(mock.executed, [
-            ['git', 'remote'],
             ['git', 'push', 'gerrit', 'HEAD:refs/for/develop']
         ])
 
         # grr review --topic=foo-bar-topic
         mock = MockGrr({})
-        mock.already_init = True
         mock.options = {'topic': 'foo-bar-topic'}
         mock.run('review')
         self.assertEqual(mock.executed, [
-            ['git', 'remote'],
             ['git', 'push', 'gerrit', 'HEAD:refs/for/master%topic=foo-bar-topic']
         ])
 
         # grr
         mock = MockGrr({})
-        mock.already_init = True
         mock.run()
         self.assertEqual(mock.executed, [
-            ['git', 'remote'],
             ['git', 'push', 'gerrit', 'HEAD:refs/for/master']
         ])
 
         # grr develop
         mock = MockGrr({})
-        mock.already_init = True
         mock.run('develop')
         self.assertEqual(mock.executed, [
-            ['git', 'remote'],
             ['git', 'push', 'gerrit', 'HEAD:refs/for/develop']
         ])
+
 
 if __name__ == '__main__':
     unittest.main()

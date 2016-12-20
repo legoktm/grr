@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import configparser
 import json
 import os.path
+import shutil
 import subprocess
 import sys
 from urllib.request import urlopen
@@ -146,11 +147,7 @@ class Grr:
         if os.path.isfile('.git/hooks/commit-msg'):
             # Already configured
             return False
-        remote = 'ssh://{username}@{host}:{port}/{project}'.format(username=self.username, **self.config)
-        self.shell_exec(['git', 'remote', 'add', 'gerrit', remote])
-        self.out('Added gerrit remote')
-        commit_msg = '{username}@{host}:hooks/commit-msg'.format(username=self.username, **self.config)
-        self.shell_exec(['scp', '-P' + self.config['port'], commit_msg, '.git/hooks/commit-msg'])
+        shutil.copy(os.path.join(os.path.dirname(__file__), 'commit-msg'), '.git/hooks/commit-msg')
         self.out('Installed commit-msg hook')
 
 
@@ -168,6 +165,7 @@ def main():
             args.remove(arg)
     g = Grr(options=options)
     g.run(*args)
+
 
 if __name__ == '__main__':
     main()

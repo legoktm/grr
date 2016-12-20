@@ -105,6 +105,7 @@ class GrrTest(unittest.TestCase):
         mock = MockGrr({})
         mock.run('review')
         self.assertEqual(mock.executed, [
+            ['git', 'config', '--get', 'gitreview.remote'],
             ['git', 'push', 'gerrit', 'HEAD:refs/for/master']
         ])
 
@@ -112,6 +113,7 @@ class GrrTest(unittest.TestCase):
         mock = MockGrr({})
         mock.run('review', 'develop')
         self.assertEqual(mock.executed, [
+            ['git', 'config', '--get', 'gitreview.remote'],
             ['git', 'push', 'gerrit', 'HEAD:refs/for/develop']
         ])
 
@@ -120,6 +122,7 @@ class GrrTest(unittest.TestCase):
         mock.options = {'topic': 'foo-bar-topic'}
         mock.run('review')
         self.assertEqual(mock.executed, [
+            ['git', 'config', '--get', 'gitreview.remote'],
             ['git', 'push', 'gerrit', 'HEAD:refs/for/master%topic=foo-bar-topic']
         ])
 
@@ -127,6 +130,7 @@ class GrrTest(unittest.TestCase):
         mock = MockGrr({})
         mock.run()
         self.assertEqual(mock.executed, [
+            ['git', 'config', '--get', 'gitreview.remote'],
             ['git', 'push', 'gerrit', 'HEAD:refs/for/master']
         ])
 
@@ -134,7 +138,16 @@ class GrrTest(unittest.TestCase):
         mock = MockGrr({})
         mock.run('develop')
         self.assertEqual(mock.executed, [
+            ['git', 'config', '--get', 'gitreview.remote'],
             ['git', 'push', 'gerrit', 'HEAD:refs/for/develop']
+        ])
+
+        # remote set to origin
+        mock = MockGrr({})
+        mock._remote = 'origin'
+        mock.run()
+        self.assertEqual(mock.executed, [
+            ['git', 'push', 'origin', 'HEAD:refs/for/master']
         ])
 
 

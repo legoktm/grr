@@ -30,6 +30,7 @@ class Grr:
         self.options = options
         self._username = None
         self._config = None
+        self._remote = None
 
     def debug(self, text):
         if self.options.get('debug'):
@@ -109,6 +110,18 @@ class Grr:
             self._username = username
         return self._username
 
+    @property
+    def remote(self):
+        if self._remote is None:
+            try:
+                self._remote = self.shell_exec(['git', 'config', '--get', 'gitreview.remote']).strip()
+            except subprocess.CalledProcessError:
+                pass
+
+            if not self._remote:
+                self._remote = 'gerrit'
+        return self._remote
+
     def checkout(self, branch='master', quiet=False):
         args = ['git', 'checkout', 'origin/{0}'.format(branch)]
         if quiet:
@@ -124,7 +137,7 @@ class Grr:
         to = 'HEAD:refs/for/{0}'.format(branch)
         if 'topic' in self.options:
             to += '%topic=' + self.options['topic']
-        self.shell_exec(['git', 'push', 'gerrit', to])
+        self.shell_exec(['git', 'push', self.remote, to])
 
     def fetch(self, changeset):
         if ':' in changeset:

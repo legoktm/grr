@@ -157,10 +157,12 @@ class Grr:
         self.shell_exec(['git', 'fetch', fetch['url'], fetch['ref']])
 
     def init_repo(self):
-        if os.path.isfile('.git/hooks/commit-msg'):
+        git_dir = self.shell_exec(['git', 'rev-parse', '--git-dir']).strip()
+        path = os.path.join(git_dir, 'hooks/commit-msg')
+        if os.path.isfile(path):
             # Already configured
             return False
-        shutil.copy(os.path.join(os.path.dirname(__file__), 'commit-msg'), '.git/hooks/commit-msg')
+        shutil.copy(os.path.join(os.path.dirname(__file__), 'commit-msg'), path)
         self.out('Installed commit-msg hook')
 
 

@@ -53,7 +53,6 @@ class Grr:
         if action == 'init':
             # grr init
             self.init_repo()
-            self.checkout(branch='master', quiet=True)
         elif action == 'fetch':
             # grr fetch 12345
             # grr fetch 12345:2

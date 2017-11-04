@@ -6,6 +6,6 @@ python:
   - "3.6"
 sudo: false
 # command to install dependencies
-install: "pip install tox"
+install: "pip install tox-travis"
 # command to run tests
-script: tox
+script: tox && tox -e flake8

@@ -102,10 +102,9 @@ class Grr:
     def username(self):
         if self._username is None:
             try:
-                username = self.shell_exec(['git', 'config', 'gitreview.username']).strip()
+                username = self.shell_exec(['git', 'config', '--get', 'gitreview.username']).strip()
             except subprocess.CalledProcessError:
                 username = input('Please enter your gerrit username: ').strip()
-                self.shell_exec(['git', 'config', '--get', 'gitreview.username', username])
             self._username = username
         return self._username
 

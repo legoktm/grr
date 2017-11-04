@@ -124,10 +124,18 @@ class Grr:
         args = ['git', 'checkout', 'origin/{0}'.format(branch)]
         if quiet:
             args.append('-q')
-        self.shell_exec(args)
+        try:
+            self.shell_exec(args)
+        except subprocess.CalledProcessError:
+            self.out('Checkout failed')
+            sys.exit(1)
 
     def pull(self, branch='master'):
-        self.shell_exec(['git', 'fetch', 'origin'])
+        try:
+            self.shell_exec(['git', 'fetch', 'origin'])
+        except subprocess.CalledProcessError:
+            self.out('Fetching origin failed')
+            sys.exit(1)
         self.checkout(branch)
 
     def review(self, branch='master'):
@@ -135,7 +143,10 @@ class Grr:
         to = 'HEAD:refs/for/{0}'.format(branch)
         if 'topic' in self.options:
             to += '%topic=' + self.options['topic']
-        self.shell_exec(['git', 'push', self.remote, to])
+        try:
+            self.shell_exec(['git', 'push', self.remote, to])
+        except subprocess.CalledProcessError:
+            sys.exit(1)
 
     def fetch(self, changeset):
         if ':' in changeset:

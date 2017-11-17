@@ -31,4 +31,4 @@ Installation:
 
 Licensed as GPLv3 or later, see COPYING for details.
 
-_git-review: https://pypi.python.org/pypi/git-review
+.. _git-review: https://pypi.python.org/pypi/git-review

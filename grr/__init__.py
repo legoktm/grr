@@ -130,13 +130,26 @@ class Grr:
             self.out('Checkout failed')
             sys.exit(1)
 
+    def rebase(self, branch='master', quiet=False):
+        args = ['git', 'rebase', 'origin/{0}'.format(branch)]
+        if quiet:
+            args.append('-q')
+        try:
+            self.shell_exec(args)
+        except subprocess.CalledProcessError:
+            self.out('Rebase failed')
+            sys.exit(1)
+
     def pull(self, branch='master'):
         try:
             self.shell_exec(['git', 'fetch', 'origin'])
         except subprocess.CalledProcessError:
             self.out('Fetching origin failed')
             sys.exit(1)
-        self.checkout(branch)
+        if self.options.get('rebase'):
+            self.rebase(branch)
+        else:
+            self.checkout(branch)
 
     def review(self, branch='master'):
         self.init_repo()

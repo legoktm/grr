@@ -41,6 +41,14 @@ class GrrTest(unittest.TestCase):
             ['git', 'checkout', 'origin/master']
         ])
 
+        # grr pull
+        mock = MockGrr({'rebase': True})
+        mock.run('pull')
+        self.assertEqual(mock.executed, [
+            ['git', 'fetch', 'origin'],
+            ['git', 'rebase', 'origin/master']
+        ])
+
         # grr pull develop
         mock = MockGrr({})
         mock.run('pull', 'develop')

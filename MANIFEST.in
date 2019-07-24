@@ -1,1 +1,2 @@
 include grr/commit-msg
+include COPYING

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+import pytest
 import os
 
 import grr
@@ -30,147 +31,99 @@ class MockGrr(grr.Grr):
         return d
 
 
-class TestGrr:
-    def test_pull(self):
-        # grr pull
-        mock = MockGrr({})
-        mock.run('pull')
-        assert mock.executed == [
-            ['git', 'fetch', 'origin'],
-            ['git', 'checkout', 'origin/master']
-        ]
+@pytest.mark.parametrize('options,run,executed', [
+    # grr pull
+    ({}, ['pull'], [
+        ['git', 'fetch', 'origin'],
+        ['git', 'checkout', 'origin/master']
+    ]),
+    # grr pull --rebase
+    ({'rebase': True}, ['pull'], [
+        ['git', 'fetch', 'origin'],
+        ['git', 'rebase', 'origin/master']
+    ]),
+    # grr pull develop
+    ({}, ['pull', 'develop'], [
+        ['git', 'fetch', 'origin'],
+        ['git', 'checkout', 'origin/develop']
+    ]),
+    # grr checkout
+    ({}, ['checkout'], [
+        ['git', 'checkout', 'origin/master']
+    ]),
+    # grr checkout develop
+    ({}, ['checkout', 'develop'], [
+        ['git', 'checkout', 'origin/develop']
+    ]),
+    # grr fetch 12345:2
+    ({}, ['fetch', '12345:2'], [
+        ['git', 'fetch', 'https://gerrit.example.org/r/gerrit/example', 'refs/changes/45/12345/2'],
+        ['git', 'checkout', 'FETCH_HEAD']
+    ]),
+    # grr fetch 12345
+    # Note: this test is based on rest_api.json
+    ({}, ['fetch', '12345'], [
+        ['git', 'fetch', 'https://gerrit.wikimedia.org/r/mediawiki/core', 'refs/changes/25/303525/1'],
+        ['git', 'checkout', 'FETCH_HEAD']
+    ]),
+    # grr cherry-pick 12345:2
+    ({}, ['cherry-pick', '12345:2'], [
+        ['git', 'fetch', 'https://gerrit.example.org/r/gerrit/example', 'refs/changes/45/12345/2'],
+        ['git', 'cherry-pick', 'FETCH_HEAD']
+    ]),
+    # grr cherry-pick 12345
+    # Note: this test is based on rest_api.json
+    ({}, ['cherry-pick', '12345'], [
+        ['git', 'fetch', 'https://gerrit.wikimedia.org/r/mediawiki/core', 'refs/changes/25/303525/1'],
+        ['git', 'cherry-pick', 'FETCH_HEAD']
+    ]),
+    # grr review
+    ({}, ['review'], [
+        ['git', 'config', '--get', 'gitreview.remote'],
+        ['git', 'push', 'gerrit', 'HEAD:refs/for/master']
+    ]),
+    # grr review develop
+    ({}, ['review', 'develop'], [
+        ['git', 'config', '--get', 'gitreview.remote'],
+        ['git', 'push', 'gerrit', 'HEAD:refs/for/develop']
+    ]),
+    # grr review --topic=foo-bar-topic
+    ({'topic': 'foo-bar-topic'}, ['review'], [
+        ['git', 'config', '--get', 'gitreview.remote'],
+        ['git', 'push', 'gerrit', 'HEAD:refs/for/master%topic=foo-bar-topic']
+    ]),
+    # grr review --code-review=+2 --submit --verified=+2
+    ({'code-review': '+2', 'submit': True, 'verified': '+2'}, ['review'], [
+        ['git', 'config', '--get', 'gitreview.remote'],
+        ['git', 'push', 'gerrit', 'HEAD:refs/for/master%l=Code-Review+2,l=Verified+2,submit']
+    ]),
+    # grr review --hashtags=one,two,three
+    ({'hashtags': 'one,two,three'}, ['review'], [
+        ['git', 'config', '--get', 'gitreview.remote'],
+        ['git', 'push', 'gerrit', 'HEAD:refs/for/master%t=one,t=two,t=three']
+    ]),
+    # grr
+    ({}, [], [
+        ['git', 'config', '--get', 'gitreview.remote'],
+        ['git', 'push', 'gerrit', 'HEAD:refs/for/master']
+    ]),
+    # grr develop
+    ({}, ['develop'], [
+        ['git', 'config', '--get', 'gitreview.remote'],
+        ['git', 'push', 'gerrit', 'HEAD:refs/for/develop']
+    ]),
+])
+def test_grr(options, run, executed):
+    mock = MockGrr(options)
+    mock.run(*run)
+    assert mock.executed == executed
 
-        # grr pull
-        mock = MockGrr({'rebase': True})
-        mock.run('pull')
-        assert mock.executed == [
-            ['git', 'fetch', 'origin'],
-            ['git', 'rebase', 'origin/master']
-        ]
 
-        # grr pull develop
-        mock = MockGrr({})
-        mock.run('pull', 'develop')
-        assert mock.executed == [
-            ['git', 'fetch', 'origin'],
-            ['git', 'checkout', 'origin/develop']
-        ]
-
-    def test_checkout(self):
-        # grr checkout
-        mock = MockGrr({})
-        mock.run('checkout')
-        assert mock.executed == [
-            ['git', 'checkout', 'origin/master']
-        ]
-
-        # grr checkout develop
-        mock = MockGrr({})
-        mock.run('checkout', 'develop')
-        assert mock.executed == [
-            ['git', 'checkout', 'origin/develop']
-        ]
-
-    def test_fetch(self):
-        # grr fetch 12345:2
-        mock = MockGrr({})
-        mock.run('fetch', '12345:2')
-        assert mock.executed == [
-            ['git', 'fetch', 'https://gerrit.example.org/r/gerrit/example', 'refs/changes/45/12345/2'],
-            ['git', 'checkout', 'FETCH_HEAD']
-        ]
-
-        # grr fetch 12345
-        # Note: this test is based on rest_api.json
-        mock = MockGrr({})
-        mock.run('fetch', '12345')
-        assert mock.executed == [
-            ['git', 'fetch', 'https://gerrit.wikimedia.org/r/mediawiki/core', 'refs/changes/25/303525/1'],
-            ['git', 'checkout', 'FETCH_HEAD']
-        ]
-
-    def test_cherry_pick(self):
-        # grr fetch 12345:2
-        mock = MockGrr({})
-        mock.run('cherry-pick', '12345:2')
-        assert mock.executed == [
-            ['git', 'fetch', 'https://gerrit.example.org/r/gerrit/example', 'refs/changes/45/12345/2'],
-            ['git', 'cherry-pick', 'FETCH_HEAD']
-        ]
-
-        # grr fetch 12345
-        # Note: this test is based on rest_api.json
-        mock = MockGrr({})
-        mock.run('cherry-pick', '12345')
-        assert mock.executed == [
-            ['git', 'fetch', 'https://gerrit.wikimedia.org/r/mediawiki/core', 'refs/changes/25/303525/1'],
-            ['git', 'cherry-pick', 'FETCH_HEAD']
-        ]
-
-    def test_review(self):
-        # grr review
-        mock = MockGrr({})
-        mock.run('review')
-        assert mock.executed == [
-            ['git', 'config', '--get', 'gitreview.remote'],
-            ['git', 'push', 'gerrit', 'HEAD:refs/for/master']
-        ]
-
-        # grr review develop
-        mock = MockGrr({})
-        mock.run('review', 'develop')
-        assert mock.executed == [
-            ['git', 'config', '--get', 'gitreview.remote'],
-            ['git', 'push', 'gerrit', 'HEAD:refs/for/develop']
-        ]
-
-        # grr review --topic=foo-bar-topic
-        mock = MockGrr({})
-        mock.options = {'topic': 'foo-bar-topic'}
-        mock.run('review')
-        assert mock.executed == [
-            ['git', 'config', '--get', 'gitreview.remote'],
-            ['git', 'push', 'gerrit', 'HEAD:refs/for/master%topic=foo-bar-topic']
-        ]
-
-        # grr review --code-review=+2 --submit --verified=+2
-        mock = MockGrr({})
-        mock.options = {'code-review': '+2', 'submit': True, 'verified': '+2'}
-        mock.run('review')
-        assert mock.executed == [
-            ['git', 'config', '--get', 'gitreview.remote'],
-            ['git', 'push', 'gerrit', 'HEAD:refs/for/master%l=Code-Review+2,l=Verified+2,submit']
-        ]
-
-        # grr review --hashtags=one,two,three
-        mock = MockGrr({})
-        mock.options = {'hashtags': 'one,two,three'}
-        mock.run('review')
-        assert mock.executed == [
-            ['git', 'config', '--get', 'gitreview.remote'],
-            ['git', 'push', 'gerrit', 'HEAD:refs/for/master%t=one,t=two,t=three']
-        ]
-
-        # grr
-        mock = MockGrr({})
-        mock.run()
-        assert mock.executed == [
-            ['git', 'config', '--get', 'gitreview.remote'],
-            ['git', 'push', 'gerrit', 'HEAD:refs/for/master']
-        ]
-
-        # grr develop
-        mock = MockGrr({})
-        mock.run('develop')
-        assert mock.executed == [
-            ['git', 'config', '--get', 'gitreview.remote'],
-            ['git', 'push', 'gerrit', 'HEAD:refs/for/develop']
-        ]
-
-        # remote set to origin
-        mock = MockGrr({})
-        mock._remote = 'origin'
-        mock.run()
-        assert mock.executed == [
-            ['git', 'push', 'origin', 'HEAD:refs/for/master']
-        ]
+def test_review():
+    # remote set to origin
+    mock = MockGrr({})
+    mock._remote = 'origin'
+    mock.run()
+    assert mock.executed == [
+        ['git', 'push', 'origin', 'HEAD:refs/for/master']
+    ]

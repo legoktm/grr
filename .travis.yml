@@ -1,11 +1,12 @@
 language: python
 python:
-  - "3.3"
   - "3.4"
   - "3.5"
   - "3.6"
+  - "3.7"
 sudo: false
+dist: xenial
 # command to install dependencies
 install: "pip install tox-travis"
 # command to run tests
-script: tox && tox -e flake8
+script: tox

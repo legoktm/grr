@@ -10,3 +10,11 @@ dist: xenial
 install: "pip install tox-travis"
 # command to run tests
 script: tox
+notifications:
+  email: false
+  irc:
+    channels:
+      - "chat.freenode.net##legoktm"
+    skip_join: true
+    on_success: change
+    on_failure: always

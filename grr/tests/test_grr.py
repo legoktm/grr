@@ -133,6 +133,24 @@ class TestGrr:
             ['git', 'push', 'gerrit', 'HEAD:refs/for/master%topic=foo-bar-topic']
         ]
 
+        # grr review --code-review=+2 --submit --verified=+2
+        mock = MockGrr({})
+        mock.options = {'code-review': '+2', 'submit': True, 'verified': '+2'}
+        mock.run('review')
+        assert mock.executed == [
+            ['git', 'config', '--get', 'gitreview.remote'],
+            ['git', 'push', 'gerrit', 'HEAD:refs/for/master%l=Code-Review+2,l=Verified+2,submit']
+        ]
+
+        # grr review --hashtags=one,two,three
+        mock = MockGrr({})
+        mock.options = {'hashtags': 'one,two,three'}
+        mock.run('review')
+        assert mock.executed == [
+            ['git', 'config', '--get', 'gitreview.remote'],
+            ['git', 'push', 'gerrit', 'HEAD:refs/for/master%t=one,t=two,t=three']
+        ]
+
         # grr
         mock = MockGrr({})
         mock.run()

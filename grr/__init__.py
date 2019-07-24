@@ -154,8 +154,20 @@ class Grr:
     def review(self, branch='master'):
         self.init_repo()
         to = 'HEAD:refs/for/{0}'.format(branch)
+        extra = []
         if 'topic' in self.options:
-            to += '%topic=' + self.options['topic']
+            extra.append('topic=' + self.options['topic'])
+        if 'code-review' in self.options:
+            extra.append('l=Code-Review' + self.options['code-review'])
+        if 'verified' in self.options:
+            extra.append('l=Verified' + self.options['verified'])
+        if self.options.get('submit'):
+            extra.append('submit')
+        if 'hashtags' in self.options:
+            for hashtag in self.options['hashtags'].split(','):
+                extra.append('t=' + hashtag)
+        if extra:
+            to += '%' + ','.join(extra)
         try:
             self.shell_exec(['git', 'push', self.remote, to])
         except subprocess.CalledProcessError:

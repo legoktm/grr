@@ -8,7 +8,7 @@ grr
     :target: https://pypi.python.org/pypi/grr/
     :alt: Latest Version
 
-``grr`` is a simple utility to make using Gerrit a little less painful. It requires Python 3.3+.
+``grr`` is a simple utility to make using Gerrit a little less painful. It requires Python 3.4+.
 
 The basic workflow involves using a detached head, and pulling down changes from gerrit to
 work on them, and re-submitting them. Inspired by git-review_, ``grr`` reads from ``.gitreview`` files

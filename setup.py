@@ -12,7 +12,7 @@ setup(
     long_description=open('README.rst').read(),
     packages=['grr'],
     install_requires=[],
-    python_requires='>=3.4',
+    python_requires='>=3.5',
     entry_points={
         'console_scripts': [
             'grr = grr:main'

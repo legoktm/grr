@@ -27,8 +27,7 @@ class MockGrr(grr.Grr):
 
     def rest_api(self, query):
         with open(os.path.join(os.path.dirname(__file__), 'rest_api.json')) as f:
-            d = json.load(f)
-        return d
+            return json.load(f)
 
 
 @pytest.mark.parametrize('options,run,executed', [

@@ -197,7 +197,7 @@ def parse_args(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--debug', action='store_true', help='Enable extra debugging output')
     subparsers = parser.add_subparsers(dest='action')
-    init = subparsers.add_parser('init')
+    subparsers.add_parser('init')
     fetch = subparsers.add_parser('fetch')
     fetch.add_argument('patch', help='Patchset to fetch')
     cherry_pick = subparsers.add_parser('cherry-pick')

@@ -16,6 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import argparse
 import configparser
 import json
 import os.path
@@ -43,12 +44,8 @@ class Grr:
         self.debug('$ ' + ' '.join(args))
         return subprocess.check_output(args).decode()
 
-    def run(self, *args):
-        args = list(args)
-        if args:
-            action = args.pop(0)
-        else:
-            action = 'review'
+    def run(self, args: list):
+        action = args.pop(0)
         self.debug('action: {0}, args: {1}'.format(action, ' '.join(args)))
         if action == 'init':
             # grr init
@@ -74,12 +71,8 @@ class Grr:
         elif action == 'review':
             # grr review REL1_24
             self.review(*args)
-        elif not action:
-            # grr
-            self.review()
         else:
-            # grr branch
-            self.review(action)
+            raise RuntimeError('Should not be possible to reach here')
 
     @property
     def config(self):
@@ -157,8 +150,8 @@ class Grr:
         extra = []
         if 'topic' in self.options:
             extra.append('topic=' + self.options['topic'])
-        if 'code-review' in self.options:
-            extra.append('l=Code-Review' + self.options['code-review'])
+        if 'code_review' in self.options:
+            extra.append('l=Code-Review' + self.options['code_review'])
         if 'verified' in self.options:
             extra.append('l=Verified' + self.options['verified'])
         if self.options.get('submit'):
@@ -200,20 +193,51 @@ class Grr:
         self.out('Installed commit-msg hook')
 
 
+def parse_args(argv):
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--debug', action='store_true', help='Enable extra debugging output')
+    subparsers = parser.add_subparsers(dest='action')
+    init = subparsers.add_parser('init')
+    fetch = subparsers.add_parser('fetch')
+    fetch.add_argument('patch', help='Patchset to fetch')
+    cherry_pick = subparsers.add_parser('cherry-pick')
+    cherry_pick.add_argument('patch', help='Patchset to cherry-pick')
+    pull = subparsers.add_parser('pull')
+    pull.add_argument('branch', nargs='?', default='master', help='Pull this branch')
+    pull.add_argument('--rebase', action='store_true', help='Rebase instead of checking out the remote branch')
+    checkout = subparsers.add_parser('checkout')
+    checkout.add_argument('branch', nargs='?', default='master', help='Checkout this branch')
+    review = subparsers.add_parser('review')
+    review.add_argument('branch', nargs='?', default='master', help='Submit patch to this branch')
+    review.add_argument('--topic', help='Gerrit topic for new patchset')
+    review.add_argument('--code-review', help='Set Code-Review label when uploading patch')
+    review.add_argument('--verified', help='Set Verified label when uploading patch')
+    review.add_argument('--submit', action='store_true', help='Submit patch after uploading')
+    review.add_argument('--hashtags', help='Comma-separated hashtags to set')
+
+    if not argv:
+        # `grr` defaults to `grr review`
+        argv.append('review')
+    elif len(argv) >= 1 and argv[0] not in subparsers.choices:
+        # Add in a default action of 'review'
+        argv.insert(0, 'review')
+
+    parsed = vars(parser.parse_args(argv))
+    args = [parsed.pop('action')]
+    if 'branch' in parsed:
+        args.append(parsed.pop('branch'))
+
+    # Filter out None values
+    options = {k: v for k, v in parsed.items() if v not in (None, False)}
+
+    return args, options
+
+
 def main():
-    args = sys.argv[1:]
-    options = {}
-    for arg in args[:]:
-        if arg.startswith('--'):
-            opt = arg[2:]
-            if '=' in opt:
-                sp = opt.split('=', 1)
-                options[sp[0]] = sp[1]
-            else:
-                options[opt] = True
-            args.remove(arg)
+    args, options = parse_args(sys.argv[1:])
+    print(args, options)
     g = Grr(options=options)
-    g.run(*args)
+    g.run(args)
 
 
 if __name__ == '__main__':

@@ -92,7 +92,7 @@ class MockGrr(grr.Grr):
         ['git', 'push', 'gerrit', 'HEAD:refs/for/master%topic=foo-bar-topic']
     ]),
     # grr review --code-review=+2 --submit --verified=+2
-    ({'code-review': '+2', 'submit': True, 'verified': '+2'}, ['review'], [
+    ({'code_review': '+2', 'submit': True, 'verified': '+2'}, ['review'], [
         ['git', 'config', '--get', 'gitreview.remote'],
         ['git', 'push', 'gerrit', 'HEAD:refs/for/master%l=Code-Review+2,l=Verified+2,submit']
     ]),
@@ -102,19 +102,19 @@ class MockGrr(grr.Grr):
         ['git', 'push', 'gerrit', 'HEAD:refs/for/master%t=one,t=two,t=three']
     ]),
     # grr
-    ({}, [], [
+    ({}, ['review', 'master'], [
         ['git', 'config', '--get', 'gitreview.remote'],
         ['git', 'push', 'gerrit', 'HEAD:refs/for/master']
     ]),
     # grr develop
-    ({}, ['develop'], [
+    ({}, ['review', 'develop'], [
         ['git', 'config', '--get', 'gitreview.remote'],
         ['git', 'push', 'gerrit', 'HEAD:refs/for/develop']
     ]),
 ])
 def test_grr(options, run, executed):
     mock = MockGrr(options)
-    mock.run(*run)
+    mock.run(run)
     assert mock.executed == executed
 
 
@@ -122,7 +122,28 @@ def test_review():
     # remote set to origin
     mock = MockGrr({})
     mock._remote = 'origin'
-    mock.run()
+    mock.run(['review', 'master'])
     assert mock.executed == [
         ['git', 'push', 'origin', 'HEAD:refs/for/master']
     ]
+
+
+@pytest.mark.parametrize('argv,expected', (
+    ('pull', (['pull', 'master'], {})),
+    ('pull --rebase', (['pull', 'master'], {'rebase': True})),
+    ('pull develop', (['pull', 'develop'], {})),
+    ('review', (['review', 'master'], {})),
+    ('review develop', (['review', 'develop'], {})),
+    ('review --topic=foo-bar-topic', (['review', 'master'], {'topic': 'foo-bar-topic'})),
+    ('review --code-review=+2 --submit --verified=+2', (['review', 'master'], {'code_review': '+2', 'submit': True, 'verified': '+2'})),
+    ('review --hashtags=one,two,three', (['review', 'master'], {'hashtags': 'one,two,three'})),
+    ('develop', (['review', 'develop'], {})),
+    ('init', (['init'], {})),
+))
+def test_parse_args(argv, expected):
+    actual = grr.parse_args(argv.split(' '))
+    assert actual == expected
+
+
+def test_parse_args_none():
+    assert grr.parse_args([]) == (['review', 'master'], {})

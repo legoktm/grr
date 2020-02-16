@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='grr',
-    version='1.0.0',
+    version='1.0.1',
     author='Kunal Mehta',
     author_email='legoktm@member.fsf.org',
     url='https://github.com/legoktm/grr/',

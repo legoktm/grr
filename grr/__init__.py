@@ -235,7 +235,6 @@ def parse_args(argv):
 
 def main():
     args, options = parse_args(sys.argv[1:])
-    print(args, options)
     g = Grr(options=options)
     g.run(args)
 

@@ -55,24 +55,24 @@ class MockGrr(grr.Grr):
         ['git', 'checkout', 'origin/develop']
     ]),
     # grr fetch 12345:2
-    ({}, ['fetch', '12345:2'], [
+    ({'patch': '12345:2'}, ['fetch'], [
         ['git', 'fetch', 'https://gerrit.example.org/r/gerrit/example', 'refs/changes/45/12345/2'],
         ['git', 'checkout', 'FETCH_HEAD']
     ]),
     # grr fetch 12345
     # Note: this test is based on rest_api.json
-    ({}, ['fetch', '12345'], [
+    ({'patch': '12345'}, ['fetch'], [
         ['git', 'fetch', 'https://gerrit.wikimedia.org/r/mediawiki/core', 'refs/changes/25/303525/1'],
         ['git', 'checkout', 'FETCH_HEAD']
     ]),
     # grr cherry-pick 12345:2
-    ({}, ['cherry-pick', '12345:2'], [
+    ({'patch': '12345:2'}, ['cherry-pick'], [
         ['git', 'fetch', 'https://gerrit.example.org/r/gerrit/example', 'refs/changes/45/12345/2'],
         ['git', 'cherry-pick', 'FETCH_HEAD']
     ]),
     # grr cherry-pick 12345
     # Note: this test is based on rest_api.json
-    ({}, ['cherry-pick', '12345'], [
+    ({'patch': '12345'}, ['cherry-pick'], [
         ['git', 'fetch', 'https://gerrit.wikimedia.org/r/mediawiki/core', 'refs/changes/25/303525/1'],
         ['git', 'cherry-pick', 'FETCH_HEAD']
     ]),
@@ -140,6 +140,7 @@ def test_review():
     ('review --hashtags=one,two,three', (['review', 'master'], {'hashtags': 'one,two,three'})),
     ('develop', (['review', 'develop'], {})),
     ('init', (['init'], {})),
+    ('fetch 12345', (['fetch'], {'patch': '12345'})),
 ))
 def test_parse_args(argv, expected):
     actual = grr.parse_args(argv.split(' '))

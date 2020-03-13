@@ -53,12 +53,12 @@ class Grr:
         elif action == 'fetch':
             # grr fetch 12345
             # grr fetch 12345:2
-            self.fetch(args[0])
+            self.fetch(self.options['patch'])
             self.shell_exec(['git', 'checkout', 'FETCH_HEAD'])
         elif action == 'cherry-pick':
             # grr fetch 12345
             # grr fetch 12345:2
-            self.fetch(args[0])
+            self.fetch(self.options['patch'])
             self.shell_exec(['git', 'cherry-pick', 'FETCH_HEAD'])
         elif action == 'pull':
             # grr pull

@@ -1,5 +1,9 @@
-grr
-===
+grr (deprecated)
+================
+
+The Python version of ``grr`` is deprecated. A maintained Rust version is available on GitLab_.
+Please use that instead.
+
 .. image:: https://travis-ci.org/legoktm/grr.svg?branch=master
    :alt: Build Status
    :target: https://travis-ci.org/legoktm/grr
@@ -32,3 +36,4 @@ Installation:
 Licensed as GPLv3 or later, see COPYING for details.
 
 .. _git-review: https://pypi.python.org/pypi/git-review
+.. _GitLab: https://gitlab.com/legoktm/rust-grr/
